@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/danka-website   # <- replace with your site's GitHub repo
+  repo: abhiramjois/danka-website
   branch: main
   # Uncomment & add a personal access token if your repo is private:
   # auth_scope: repo
