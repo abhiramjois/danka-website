@@ -13,8 +13,8 @@ media_folder: /static/images
 public_folder: /images
 
 # Optional: enable web UI entry points to preview deployed site
-site_url: https://danka.example.com
-display_url: https://danka.example.com
+site_url: https://dankastudios.com
+display_url: https://dankastudios.com
 logo_url: /images/channel-fallback.svg
 
 collections:
