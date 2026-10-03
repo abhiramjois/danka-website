@@ -1,5 +1,4 @@
 import { defineConfig } from 'tinacms'
-import { TinaCloudBackendAuthProvider } from '@tinacms/auth'
 import schema from './schema'
 
 // Netlify/most CI providers expose the deployed branch as HEAD.
@@ -13,9 +12,10 @@ export default defineConfig({
   branch,
   clientId,
   token,
-  // Sign-in is handled by Tina Cloud, so Netlify Identity is not involved.
-  // Invite collaborators from the Tina dashboard — no GitHub PATs needed.
-  authProvider: TinaCloudBackendAuthProvider(clientId ?? undefined),
+  // Do not set `authProvider`. tinacms builds its own TinaCloudAuthProvider
+  // from clientId/token when none is configured. @tinacms/auth's
+  // TinaCloudBackendAuthProvider is a Next.js API-route helper that lacks
+  // getSessionProvider and breaks the admin bundle.
   build: {
     // SvelteKit serves static files from `static/`, not `public/`.
     // This puts the admin SPA at /admin/index.html.

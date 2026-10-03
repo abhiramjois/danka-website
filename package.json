@@ -31,7 +31,6 @@
 	},
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.5.7",
-		"@tinacms/auth": "^1.1.5",
 		"@tinacms/cli": "^3.0.0",
 		"gray-matter": "^4.0.3",
 		"marked": "^18.0.13",
