@@ -2,7 +2,8 @@
 # See https://sveltiacms.app/en/docs for the full config reference.
 
 backend:
-  name: git-gateway
+  name: github
+  repo: dankastudios/danka-website
   branch: main
 
 # Where uploaded media is stored (relative to the repo root) & the URL it maps to.
