@@ -35,10 +35,12 @@ Tina dashboard.
    `dankastudios/danka-website`
 2. Copy `.env.example` to `.env` and set `NEXT_PUBLIC_TINA_CLIENT_ID` and
    `TINA_TOKEN` from the project's **Connect** screen
-3. Run `npm run dev` once — this writes `tina/tina-lock.json`, which **must be
-   committed** (it pins the schema Tina Cloud indexes)
-4. Add the same two variables in Netlify under **Site settings → Environment
+3. Add the same two variables in Netlify under **Site settings → Environment
    variables**, then redeploy
+
+`tina/tina-lock.json` pins the schema Tina Cloud indexes — it contains no
+credentials and is committed. Re-run `npm run tina:build` and commit it after
+any change to `tina/schema.ts`.
 
 Until those variables are set, `npm run build` skips the CMS build and logs a
 warning rather than failing, so the site itself always deploys.
@@ -46,12 +48,16 @@ warning rather than failing, so the site itself always deploys.
 Media uploads go to `static/images/` and are served from `/images/…`, matching
 the existing image paths.
 
-### YouTube live data
+### YouTube data
 
-Stats (subscribers / videos / views — including Shorts) and the latest video thumbnails are fetched with **yt-dlp** and refresh in real time: the client polls `/api/youtube` every 60s and responses are cached server-side for 60s.
+Stats (subscribers / videos / views — including Shorts) and the latest video thumbnails are refreshed by `scripts/fetch-youtube.mjs`, which uses **yt-dlp** and writes `src/lib/data/youtube.json`. The site imports that JSON at build time and `/api/youtube` serves it, so refresh it before building:
 
-1. Install yt-dlp once: `brew install yt-dlp`
-2. (Optional) copy `.env.example` to `.env` and override `YOUTUBE_CHANNEL_URL`, `YTDLP_PATH` or `YOUTUBE_CACHE_TTL_MS`
+```sh
+brew install yt-dlp   # once
+npm run fetch:youtube
+```
+
+Optionally set `YOUTUBE_CHANNEL_URL` or `YTDLP_PATH` in `.env`.
 
 > If yt-dlp isn't available or YouTube blocks the request, the site falls back to the numbers in the Home page content (editable in the CMS) and placeholder thumbnails.
 
