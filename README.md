@@ -1,20 +1,50 @@
 # Danka Studios — Website
 
-Website for the art collective **Danka Studios** ([YouTube @DankaStudios](https://www.youtube.com/@DankaStudios)), built with SvelteKit and managed with **Sveltia CMS**.
+Website for the art collective **Danka Studios** ([YouTube @DankaStudios](https://www.youtube.com/@DankaStudios)), built with SvelteKit and managed with **Tina CMS**.
 
 - Black + terracotta (`#cc7c74`) editorial design, matching `landingpage.pdf`
 - Home: hero, **live YouTube stats & latest-video thumbnails**, CTA, collaboration types and team sections
 - `/folio` — projects: title, linked URL, rich-text description, gallery, tags (sub-pages slugged by title)
 - `/people` — members: name, profile photo, bio, roles (sub-pages slugged by title)
 - `/collaborate` — collab types: type, description, link to a Folio project (sub-pages slugged by title)
-- Content authored entirely through Sveltia CMS at **`/admin`**
+- Content authored entirely through Tina CMS at **`/admin`**
 
 ## Getting started
 
 ```sh
 npm install
+cp .env.example .env   # add your Tina Cloud credentials
 npm run dev -- --open
 ```
+
+`npm run dev` runs the Tina dev server alongside Vite, so the CMS at `/admin` can
+read and write your local content. Use `npm run dev:site` if you only want the
+site without the CMS.
+
+### Tina CMS
+
+The admin app is served at **`/admin/index.html`** (generated into `static/admin/`
+by `tinacms dev` / `tinacms build`). Its content model lives in `tina/schema.ts`
+and its options in `tina/config.ts`.
+
+Auth is handled by **Tina Cloud**, so there are no GitHub personal access tokens
+and Netlify Identity is not involved. Collaborators are invited by email from the
+Tina dashboard.
+
+1. Create a free project at [app.tina.io](https://app.tina.io) and connect
+   `dankastudios/danka-website`
+2. Copy `.env.example` to `.env` and set `NEXT_PUBLIC_TINA_CLIENT_ID` and
+   `TINA_TOKEN` from the project's **Connect** screen
+3. Run `npm run dev` once — this writes `tina/tina-lock.json`, which **must be
+   committed** (it pins the schema Tina Cloud indexes)
+4. Add the same two variables in Netlify under **Site settings → Environment
+   variables**, then redeploy
+
+Until those variables are set, `npm run build` skips the CMS build and logs a
+warning rather than failing, so the site itself always deploys.
+
+Media uploads go to `static/images/` and are served from `/images/…`, matching
+the existing image paths.
 
 ### YouTube live data
 
@@ -25,14 +55,6 @@ Stats (subscribers / videos / views — including Shorts) and the latest video t
 
 > If yt-dlp isn't available or YouTube blocks the request, the site falls back to the numbers in the Home page content (editable in the CMS) and placeholder thumbnails.
 
-### Sveltia CMS
-
-The admin app is served at **`/admin`** (self-hosted build in `static/admin/`, config in `static/admin/config.yml`).
-
-1. Push this project to its own GitHub repo (e.g. `yourname/danka-website`)
-2. Set that repo in `static/admin/config.yml` → `backend.repo`
-3. Open `/admin` and sign in with GitHub — content edits commit straight to `main`
-
 ### Content structure
 
 ```
@@ -41,7 +63,7 @@ content/
   pages/folio.md         folio page intro
   pages/people.md        people page intro
   pages/collaborate.md   collaborate page intro
-  folio/*.md             folio projects (title, url, tags, gallery, body)
+  folio/*.md             folio projects (title, url, date, tags, gallery, body)
   people/*.md            people (name, photo, roles, body)
   collaborations/*.md    collab types (title, subtitle, image, folio link, body)
 ```
@@ -51,5 +73,6 @@ New entries created in the CMS are saved to `{title-slug}.md` automatically.
 ## Building
 
 ```sh
-npm run build   # adapter-node — requires a Node server for the YouTube proxy
+npm run build   # tinacms build (when credentials are present) + vite build
+npm run check   # svelte-check
 ```

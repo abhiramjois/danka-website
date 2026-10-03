@@ -21,3 +21,9 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Tina CMS
+# Admin SPA + media/generated client are build artifacts. tina/tina-lock.json
+# and tina/schema.ts are NOT ignored — they must be committed.
+/static/admin
+/tina/__generated__
