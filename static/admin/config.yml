@@ -1,5 +1,11 @@
 # Sveltia CMS — Danka Studios
 # See https://sveltiacms.app/en/docs for the full config reference.
+#
+# GitHub auth is routed through Netlify's OAuth endpoint
+# (https://api.netlify.com/auth?provider=github&site_id=<hostname>).
+# That endpoint only resolves if Identity is enabled for the site:
+#   Netlify dashboard → Identity → Enable Identity
+# Without it, "Sign in with GitHub" returns 404 Not Found.
 
 backend:
   name: github
