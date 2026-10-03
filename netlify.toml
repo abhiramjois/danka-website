@@ -3,4 +3,6 @@
   publish = ".netlify/build"
 
 [build.environment]
-  NODE_VERSION = "20"
+  # Tina's dependency @whatwg-node/promise-helpers requires node >=22.15.0,
+  # and posthog-node requires >=22.22.0. Verified against 22.23.3.
+  NODE_VERSION = "22"

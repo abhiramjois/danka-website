@@ -3,6 +3,9 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"engines": {
+		"node": ">=22.15.0"
+	},
 	"scripts": {
 		"dev": "tinacms dev --watch \"vite dev\"",
 		"dev:site": "vite dev",
