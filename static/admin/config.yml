@@ -2,11 +2,8 @@
 # See https://sveltiacms.app/en/docs for the full config reference.
 
 backend:
-  name: github
-  repo: abhiramjois/danka-website
+  name: git-gateway
   branch: main
-  # Uncomment & add a personal access token if your repo is private:
-  # auth_scope: repo
 
 # Where uploaded media is stored (relative to the repo root) & the URL it maps to.
 media_folder: /static/images
