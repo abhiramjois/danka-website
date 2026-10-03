@@ -1,17 +1,23 @@
 # Sveltia CMS — Danka Studios
 # See https://sveltiacms.app/en/docs for the full config reference.
 #
-# GitHub auth is routed through Netlify's OAuth endpoint
-# (https://api.netlify.com/auth?provider=github&site_id=<hostname>).
-# That endpoint only resolves if Identity is enabled for the site:
-#   Netlify dashboard → Identity → Enable Identity
-# Without it, "Sign in with GitHub" returns 404 Not Found.
+# Auth: Netlify's built-in GitHub OAuth client (api.netlify.com/auth) returns 404
+# for this site even with Identity + the GitHub external provider enabled, since
+# Netlify Identity is deprecated. We therefore use personal access tokens.
+# `auth_methods: [token]` hides the broken "Sign in with GitHub" OAuth button and
+# leaves only "Sign In Using Access Token" on the login screen.
+#
+# Each editor: GitHub → Settings → Developer settings → Personal access tokens →
+# Tokens (classic) → generate with scopes `public_repo` + `user`, then paste it
+# into the CMS login screen. Tokens require write access to this repo, so every
+# editor's GitHub account must be a collaborator on dankastudios/danka-website.
 
 backend:
   name: github
   repo: dankastudios/danka-website
   branch: main
-  auth_scope: public_repo
+  auth_methods:
+    - token
 
 # Where uploaded media is stored (relative to the repo root) & the URL it maps to.
 media_folder: /static/images
