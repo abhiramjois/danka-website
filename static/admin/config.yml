@@ -5,6 +5,7 @@ backend:
   name: github
   repo: dankastudios/danka-website
   branch: main
+  base_url: https://api.github.com
 
 # Where uploaded media is stored (relative to the repo root) & the URL it maps to.
 media_folder: /static/images
