@@ -1,0 +1,36 @@
+name: Refresh YouTube data
+
+on:
+  schedule:
+    # Runs once a day at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # allow manual trigger
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # yt-dlp is needed to fetch channel data and download thumbnails
+      - name: Install yt-dlp
+        run: pip install --break-system-packages yt-dlp
+
+      - name: Fetch YouTube data
+        run: npm run fetch:youtube
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/images/thumbnails/ src/lib/data/youtube.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: refresh YouTube thumbnails and stats"
+            git push
+          fi

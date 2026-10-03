@@ -2,8 +2,7 @@
 	let open = $state(false);
 	const links = [
 		{ href: '/folio', label: 'Folio' },
-		{ href: '/people', label: 'People' },
-		{ href: '/collaborate', label: 'Collaborate' }
+		{ href: '/people', label: 'People' }
 	];
 </script>
 
@@ -17,7 +16,7 @@
 			{#each links as link (link.href)}
 				<a href={link.href} class="nav-link">{link.label}</a>
 			{/each}
-			<a class="nav-cta" href="/collaborate">Work with us</a>
+			<a class="nav-cta" href="/collaborate">Collaborate</a>
 		</nav>
 
 		<button
@@ -32,10 +31,10 @@
 
 	{#if open}
 		<nav class="mobile-nav" aria-label="Mobile">
-			{#each links as link (link.href)}
-				<a href={link.href} class="mobile-link" onclick={() => (open = false)}>{link.label}</a>
-			{/each}
-			<a href="/collaborate" class="mobile-cta" onclick={() => (open = false)}>Work with us</a>
+{#each links as link (link.href)}
+			<a href={link.href} class="mobile-link" onclick={() => (open = false)}>{link.label}</a>
+		{/each}
+		<a href="/collaborate" class="mobile-cta" onclick={() => (open = false)}>Collaborate</a>
 		</nav>
 	{/if}
 </header>
@@ -44,7 +43,7 @@
 	.site-head {
 		position: relative;
 		border-bottom: 1px solid var(--line);
-		background: rgba(0, 0, 0, 0.6);
+		background: rgba(255, 255, 255, 0.78);
 		backdrop-filter: blur(8px);
 		z-index: 50;
 	}
@@ -111,7 +110,7 @@
 		font-size: 0.8rem;
 		text-transform: uppercase;
 		letter-spacing: 0.26em;
-		color: #120d0d;
+		color: #fff;
 		background: var(--accent);
 		padding: 0.55rem 1.15rem;
 		border-radius: 999px;
@@ -119,7 +118,7 @@
 	}
 
 	.nav-cta:hover {
-		background: #e08b82;
+		background: #d17f76;
 	}
 
 	.burger {
@@ -154,7 +153,7 @@
 	.mobile-cta {
 		align-self: flex-start;
 		background: var(--accent);
-		color: #120d0d;
+		color: #fff;
 		padding: 0.6rem 1.2rem;
 		border-radius: 999px;
 		font-size: 0.8rem;

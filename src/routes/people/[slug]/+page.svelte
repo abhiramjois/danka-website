@@ -72,7 +72,7 @@
 	.person-photo-empty {
 		aspect-ratio: 4 / 5;
 		border-radius: var(--radius);
-		background: linear-gradient(135deg, #101010, #1a1516);
+		background: linear-gradient(135deg, #f0ece8, #e5ded8);
 	}
 
 	.person-name {

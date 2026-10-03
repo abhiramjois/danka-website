@@ -1,12 +1,31 @@
 import { readHomeContent, readFolioItems, readPeople, readCollaborations } from '$lib/content';
 import { getYouTubeData } from '$lib/server/youtube';
 
+export type DankaMark = {
+	side: 'left' | 'right';
+	offsetTop: number;
+	x: number;
+	r: number;
+};
+
+function makeDankaMarks(): DankaMark[] {
+	return (['left', 'right'] as const).map((side) => {
+		const visible = 0.5 + Math.random() * 0.2;
+		return {
+			side,
+			offsetTop: Math.round(8 + Math.random() * 46),
+			x: (1 - visible) * 100,
+			r: side === 'right' ? -7 : 7
+		};
+	});
+}
+
 export const load = async () => {
 	const home = readHomeContent();
 	const folio = readFolioItems();
 	const people = readPeople();
 	const collaborations = readCollaborations();
-	const youtube = await getYouTubeData();
+	const youtube = getYouTubeData();
 
 	const defaultRoles = ['Filmmakers', 'Directors', 'Storytellers', 'Writers', 'Creators', 'Musicians', 'Theatre practitioners', 'Artists'];
 	const roles = people.length ? Array.from(new Set(people.flatMap((p) => p.roles))).filter(Boolean) : defaultRoles;
@@ -18,6 +37,7 @@ export const load = async () => {
 		collaborations,
 		youtube,
 		roles,
-		channelUrl: `https://www.youtube.com/channel/${youtube.channel.channelId}`
+		channelUrl: `https://www.youtube.com/channel/${youtube.channel.channelId}`,
+		dankaMarks: makeDankaMarks()
 	};
 };

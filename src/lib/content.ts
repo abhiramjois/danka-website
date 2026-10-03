@@ -4,13 +4,20 @@ import path from 'node:path';
 
 const CONTENT_ROOT = path.join(process.cwd(), 'content');
 
+export type Credit = { role: string; name: string };
+
 export type FolioItem = {
 	slug: string;
 	title: string;
 	url: string;
 	description: string;
-	gallery: string[];
+	cover: string;
+	posters: string[];
+	screengrabs: string[];
 	tags: string[];
+	director: string;
+	writer: string;
+	cast_crew: Credit[];
 };
 
 export type Person = {
@@ -76,6 +83,16 @@ function str(v: unknown, fallback = ''): string {
 	return typeof v === 'string' ? v : fallback;
 }
 
+// Image widget values can be stored as absolute URLs (/images/foo.png) or as
+// bare paths relative to the media folder (foo.png / img/foo.png) depending on
+// how the CMS saved the entry. Normalize both to public URLs under /images/.
+function resolveMediaPath(v: string): string {
+	const trimmed = v.trim();
+	if (!trimmed) return '';
+	if (trimmed.startsWith('/')) return trimmed;
+	return `/images/${trimmed.replace(/^\.\.?\//, '')}`;
+}
+
 function strList(v: unknown): string[] {
 	if (Array.isArray(v)) {
 		return v.flatMap((x) => {
@@ -95,6 +112,19 @@ function strList(v: unknown): string[] {
 		if (Array.isArray(o.items)) return strList(o.items);
 	}
 	return [];
+}
+
+function pairList(v: unknown): Credit[] {
+	if (!Array.isArray(v)) return [];
+	return v.flatMap((x) => {
+		if (x && typeof x === 'object') {
+			const o = x as Record<string, unknown>;
+			const role = typeof o.role === 'string' ? o.role.trim() : '';
+			const name = typeof o.name === 'string' ? o.name.trim() : '';
+			return role || name ? [{ role, name }] : [];
+		}
+		return [];
+	});
 }
 
 export function readHomeContent(): HomeContent {
@@ -136,19 +166,39 @@ export function readPageContent(slug: string): PageContent | null {
 }
 
 export function readFolioItems(): FolioItem[] {
-	return listDir('folio').map((f) => readFolioItem(f.replace(/\.md$/, ''))).filter((x): x is FolioItem => !!x);
+	return listDir('folio')
+		.map((f) => readFolioItem(f.replace(/\.md$/, '')))
+		.filter((x): x is FolioItem => !!x)
+		.sort((a, b) => {
+			try {
+				const pa = path.join(CONTENT_ROOT, 'folio', `${a.slug}.md`);
+				const pb = path.join(CONTENT_ROOT, 'folio', `${b.slug}.md`);
+				const sa = fs.statSync(pa).mtimeMs;
+				const sb = fs.statSync(pb).mtimeMs;
+				return sb - sa;
+			} catch {
+				return 0;
+			}
+		});
 }
 
 export function readFolioItem(slug: string): FolioItem | null {
 	const file = readMarkdownFile(`content/folio/${slug}.md`);
 	if (!file) return null;
+	const posters = strList(file.data.posters).map(resolveMediaPath);
+	const screengrabs = strList(file.data.screengrabs).map(resolveMediaPath);
 	return {
 		slug,
 		title: str(file.data.title, slug),
 		url: str(file.data.url, ''),
 		description: file.content,
-		gallery: strList(file.data.gallery),
-		tags: strList(file.data.tags)
+		cover: resolveMediaPath(str(file.data.cover, posters[0] || screengrabs[0] || '')),
+		posters,
+		screengrabs,
+		tags: strList(file.data.tags),
+		director: str(file.data.director, ''),
+		writer: str(file.data.writer, ''),
+		cast_crew: pairList(file.data.cast_crew)
 	};
 }
 
@@ -162,7 +212,7 @@ export function readPerson(slug: string): Person | null {
 	return {
 		slug,
 		name: str(file.data.name, slug),
-		photo: str(file.data.photo, ''),
+		photo: resolveMediaPath(str(file.data.photo, '')),
 		bio: file.content,
 		roles: strList(file.data.roles)
 	};
@@ -179,7 +229,7 @@ export function readCollaboration(slug: string): Collaboration | null {
 		slug,
 		title: str(file.data.title, slug),
 		subtitle: str(file.data.subtitle),
-		image: str(file.data.image),
+		image: resolveMediaPath(str(file.data.image)),
 		description: file.content,
 		folio: str(file.data.folio),
 		url: str(file.data.url)

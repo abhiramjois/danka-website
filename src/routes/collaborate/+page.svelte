@@ -1,18 +1,27 @@
 <script lang="ts">
 	type PageContent = { title: string; description: string };
 
-	type CollabItem = {
-		slug: string;
-		title: string;
-		subtitle?: string;
-		image?: string;
-		description: string;
-		folioLink: string | null;
-	};
+	let { data }: { data: { page: PageContent | null } } = $props();
 
-	let { data }: { data: { items: CollabItem[]; page: PageContent | null } } = $props();
+	const { page } = $derived(data);
 
-	const { items, page } = $derived(data);
+	const CONTACT_EMAIL = 'hello@dankastudios.com';
+
+	const projectTypes = ['Short film', 'Theatre', 'Music', 'Brand ads', 'Other'];
+
+	let name = $state('');
+	let email = $state('');
+	let projectType = $state(projectTypes[0]);
+	let message = $state('');
+
+	function onSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		const subject = encodeURIComponent(`Collaboration enquiry — ${name}`);
+		const body = encodeURIComponent(
+			`Name: ${name}\nEmail: ${email}\nProject type: ${projectType}\n\nMessage:\n${message}`
+		);
+		window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+	}
 </script>
 
 <svelte:head>
@@ -28,30 +37,35 @@
 	{/if}
 </section>
 
-<section class="container section collab-grid-wrap">
-	{#if items.length}
-		<div class="collab-grid">
-			{#each items as item (item.slug)}
-				<a class="collab-item" href={`/collaborate/${item.slug}`}>
-					{#if item.image}
-						<div class="collab-media">
-							<img src={item.image} alt={item.title} loading="lazy" />
-						</div>
-					{:else}
-						<div class="collab-media collab-media-empty"></div>
-					{/if}
-					<div class="collab-body">
-						<h2 class="collab-name">{item.title}</h2>
-						{#if item.subtitle}
-							<p class="collab-sub muted">{item.subtitle}</p>
-						{/if}
-					</div>
-				</a>
-			{/each}
-		</div>
-	{:else}
-		<p class="muted center empty-state">No collaboration types yet. Add them in the CMS at <a class="accent" href="/admin">/admin</a>.</p>
-	{/if}
+<section class="container section form-wrap">
+	<form class="contact-form" onsubmit={onSubmit}>
+		<label class="field">
+			<span class="field-label">Your name</span>
+			<input type="text" name="name" bind:value={name} required placeholder="What should we call you?" />
+		</label>
+
+		<label class="field">
+			<span class="field-label">Email</span>
+			<input type="email" name="email" bind:value={email} required placeholder="you@example.com" />
+		</label>
+
+		<label class="field">
+			<span class="field-label">What are you looking to make?</span>
+			<select name="project-type" bind:value={projectType}>
+				{#each projectTypes as type (type)}
+					<option value={type}>{type}</option>
+				{/each}
+			</select>
+		</label>
+
+		<label class="field">
+			<span class="field-label">Tell us about it</span>
+			<textarea name="message" bind:value={message} rows="6" placeholder="Your idea, timeline, anything that helps us understand…"></textarea>
+		</label>
+
+		<button class="btn btn-solid submit" type="submit">Send enquiry</button>
+		<p class="muted-soft form-hint">Opens your email app with the details filled in.</p>
+	</form>
 </section>
 
 <style>
@@ -70,69 +84,65 @@
 		margin-inline: auto;
 	}
 
-	.collab-grid-wrap {
+	.form-wrap {
 		padding-top: 0;
+		display: flex;
+		justify-content: center;
 	}
 
-	.collab-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: clamp(1rem, 2vw, 1.5rem);
+	.contact-form {
+		width: 100%;
+		max-width: 560px;
+		display: flex;
+		flex-direction: column;
+		gap: 1.4rem;
 	}
 
-	.collab-item {
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.field-label {
+		font-size: 0.72rem;
+		text-transform: uppercase;
+		letter-spacing: 0.24em;
+		color: var(--muted);
+	}
+
+	input,
+	select,
+	textarea {
+		font-family: var(--sans);
+		font-size: 1rem;
+		font-weight: 300;
+		color: var(--ink);
+		background: var(--card);
 		border: 1px solid var(--line);
 		border-radius: var(--radius);
-		background: var(--card);
-		overflow: hidden;
-		transition: transform 0.2s ease, border-color 0.2s ease;
+		padding: 0.8rem 1rem;
+		transition: border-color 0.15s ease;
 	}
 
-	.collab-item:hover {
-		transform: translateY(-4px);
+	input::placeholder,
+	textarea::placeholder {
+		color: var(--muted-soft);
+	}
+
+	input:focus,
+	select:focus,
+	textarea:focus {
+		outline: none;
 		border-color: var(--accent);
 	}
 
-	.collab-media img {
-		aspect-ratio: 16 / 10;
-		width: 100%;
-		object-fit: cover;
+	.submit {
+		align-self: flex-start;
+		border: 0;
 	}
 
-	.collab-media-empty {
-		aspect-ratio: 16 / 10;
-		background: linear-gradient(135deg, #101010, #1a1516);
-	}
-
-	.collab-body {
-		padding: 1.15rem 1.2rem 1.3rem;
-	}
-
-	.collab-name {
-		font-family: var(--display);
-		font-size: 1.5rem;
-		font-weight: 400;
-		color: var(--accent);
-	}
-
-	.collab-sub {
-		margin-top: 0.3rem;
-		font-size: 0.9rem;
-	}
-
-	.empty-state {
-		padding: 3rem 1rem;
-	}
-
-	@media (max-width: 900px) {
-		.collab-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	@media (max-width: 560px) {
-		.collab-grid {
-			grid-template-columns: 1fr;
-		}
+	.form-hint {
+		font-size: 0.82rem;
 	}
 </style>

@@ -13,35 +13,6 @@
 		fallbackStats?: { subscribers: string; videos: string; views: string };
 	} = $props();
 
-	const pollInterval = 60 * 1000;
-	let timer: ReturnType<typeof setInterval> | null = null;
-
-	async function refresh() {
-		try {
-			const res = await fetch('/api/youtube');
-			if (res.ok) {
-				const data = (await res.json()) as YtData;
-				youtube = data;
-			}
-		} catch {
-			// keep last known values
-		}
-	}
-
-	function onVisible() {
-		if (document.visibilityState === 'visible') refresh();
-	}
-
-	$effect(() => {
-		refresh();
-		timer = setInterval(refresh, pollInterval);
-		document.addEventListener('visibilitychange', onVisible);
-		return () => {
-			if (timer) clearInterval(timer);
-			document.removeEventListener('visibilitychange', onVisible);
-		};
-	});
-
 	const stats = $derived(
 		youtube.source === 'fallback' && fallbackStats
 			? [
@@ -67,17 +38,18 @@
 					thumbnail: fallbackThumbs[i % fallbackThumbs.length]
 				}))
 	);
+
+	function hideOnError(e: Event) {
+		(e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
+	}
 </script>
 
 <section class="container section youtube-section">
-	<div class="marquee">
-		<div class="marquee-track">
-			{#each cards as card, i (card.videoId || i)}
-				<img class="marquee-img" src={card.thumbnail} alt="" loading="lazy" draggable="false" />
-			{/each}
-			{#each cards as card, i (card.videoId || `b-${i}`)}
-				<img class="marquee-img" src={card.thumbnail} alt="" loading="lazy" draggable="false" />
-			{/each}
+	<div class="journey">
+		<p class="display display-md journey-title">{title}</p>
+		<div class="journey-actions">
+			<a class="btn btn-solid" href={channelUrl} target="_blank" rel="noopener noreferrer">Youtube</a>
+			<a class="btn btn-outline" href="/folio">Folio</a>
 		</div>
 	</div>
 
@@ -90,11 +62,14 @@
 		{/each}
 	</div>
 
-	<div class="journey">
-		<p class="display display-md journey-title">{title}</p>
-		<div class="journey-actions">
-			<a class="btn btn-solid" href={channelUrl} target="_blank" rel="noopener noreferrer">Youtube</a>
-			<a class="btn btn-outline" href="/folio">Folio</a>
+	<div class="marquee">
+		<div class="marquee-track">
+			{#each cards as card, i (card.videoId || i)}
+				<img class="marquee-img" src={card.thumbnail} alt="" draggable="false" decoding="async" onerror={hideOnError} />
+			{/each}
+			{#each cards as card, i (card.videoId || `b-${i}`)}
+				<img class="marquee-img" src={card.thumbnail} alt="" draggable="false" decoding="async" onerror={hideOnError} />
+			{/each}
 		</div>
 	</div>
 </section>
@@ -102,8 +77,10 @@
 <style>
 	.marquee {
 		overflow: hidden;
-		mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-		-webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+		margin-top: clamp(2.5rem, 5vw, 3.5rem);
+		margin-inline: calc(50% - 50vw);
+		mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+		-webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 	}
 
 	.marquee-track {
@@ -113,7 +90,7 @@
 	}
 
 	.marquee-img {
-		width: clamp(200px, 24vw, 320px);
+		width: calc((100vw - 2.5rem) / 3);
 		aspect-ratio: 16 / 9;
 		object-fit: cover;
 		background: var(--ink);
@@ -134,7 +111,7 @@
 		display: flex;
 		justify-content: center;
 		gap: clamp(2.5rem, 8vw, 6.5rem);
-		margin-top: clamp(3rem, 6vw, 4.5rem);
+		margin-top: clamp(2.5rem, 5vw, 3.5rem);
 		flex-wrap: wrap;
 	}
 
@@ -157,7 +134,6 @@
 	}
 
 	.journey {
-		margin-top: clamp(3.5rem, 7vw, 5.5rem);
 		text-align: center;
 	}
 

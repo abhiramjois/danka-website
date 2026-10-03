@@ -1,17 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap');
 
 :root {
-	--black: #000000;
-	--ink: #0d0c0c;
-	--accent: #cc7c74;
-	--accent-deep: #84504b;
-	--accent-wash: #190f0e;
-	--paper: #e8e8e8;
-	--text: #e8e8e8;
-	--muted: #9e9a9a;
-	--muted-soft: #666464;
-	--line: #262626;
-	--card: #131313;
+	--black: #fbf9f7;
+	--ink: #1a1816;
+	--accent: #c4685e;
+	--accent-deep: #954d45;
+	--accent-wash: #f6e4e1;
+	--paper: #1a1816;
+	--text: #2a2725;
+	--muted: #6d6762;
+	--muted-soft: #98918a;
+	--line: #e7e2dd;
+	--card: #ffffff;
 	--display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 	--sans: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
 	--max: 1180px;
@@ -42,7 +42,7 @@ body {
 
 ::selection {
 	background: var(--accent);
-	color: #000;
+	color: #fff;
 }
 
 a {
@@ -123,11 +123,11 @@ h1, h2, h3, h4, p, figure {
 
 .btn-solid {
 	background: var(--accent);
-	color: #120d0d;
+	color: #fff;
 }
 
 .btn-solid:hover {
-	background: #e08b82;
+	background: #d17f76;
 	transform: translateY(-1px);
 }
 

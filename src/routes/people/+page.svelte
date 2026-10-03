@@ -100,7 +100,7 @@
 
 	.person-photo-empty {
 		aspect-ratio: 1 / 1;
-		background: linear-gradient(135deg, #101010, #1a1516);
+		background: linear-gradient(135deg, #f0ece8, #e5ded8);
 	}
 
 	.person-body {
