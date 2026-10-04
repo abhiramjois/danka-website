@@ -41,15 +41,22 @@ const hasCredentials = Boolean(
 )
 
 if (hasCredentials) {
-	// --skip-indexing: TinaCloud re-indexes from the git push via its webhook,
-	// so the CI build does not need to push content up itself. Without it the
-	// build blocks on "Checking indexing process in TinaCloud", and a busy
-	// index queue (many saves in a row) makes the build sit there until the CI
-	// timeout kills it.
+	// TinaCloud re-indexes from the git push via its own webhook, so a CI
+	// build does not need to talk to TinaCloud at all.
 	//
-	// The cloud schema check is kept because it catches a schema.ts change that
-	// was never pushed, but a failure here must NOT take the site down with it.
-	const status = run(['tinacms', 'build', '--skip-indexing'])
+	// --skip-indexing     don't push content up from the build
+	// --skip-cloud-checks don't block on "Checking indexing process in
+	//                     TinaCloud". TinaCloud processes commits itself and a
+	//                     busy index queue leaves this waiting until the CI
+	//                     build is killed, which is what left deploys stuck and
+	//                     the live site serving stale content.
+	//
+	// Locally we keep both checks so schema drift is caught before it is
+	// pushed; in CI they only add a way for the deploy to fail.
+	const args = ['tinacms', 'build', '--skip-indexing']
+	if (process.env.CI) args.push('--skip-cloud-checks')
+
+	const status = run(args)
 	if (status !== 0) {
 		console.warn(
 			'\n[tina] CMS build failed — continuing so the site still deploys.\n' +
