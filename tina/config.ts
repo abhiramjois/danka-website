@@ -1,8 +1,11 @@
 import { defineConfig } from 'tinacms'
 import schema from './schema'
 
-// Netlify/most CI providers expose the deployed branch as HEAD.
-const branch = process.env.HEAD || 'main'
+// Tina needs the branch *name* to match the branch connected in TinaCloud.
+// Netlify sets BRANCH to the name and HEAD to the commit SHA, so HEAD must
+// not be preferred here or the admin queries a branch that does not exist.
+const branch =
+  process.env.TINA_BRANCH || process.env.BRANCH || process.env.HEAD || 'main'
 
 // From app.tina.io → your project → "Connect" screen.
 const clientId = process.env.NEXT_PUBLIC_TINA_CLIENT_ID || null
