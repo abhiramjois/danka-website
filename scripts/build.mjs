@@ -41,8 +41,21 @@ const hasCredentials = Boolean(
 )
 
 if (hasCredentials) {
-	const status = run(['tinacms', 'build'])
-	if (status !== 0) process.exit(status)
+	// --skip-indexing: TinaCloud re-indexes from the git push via its webhook,
+	// so the CI build does not need to push content up itself. Without it the
+	// build blocks on "Checking indexing process in TinaCloud", and a busy
+	// index queue (many saves in a row) makes the build sit there until the CI
+	// timeout kills it.
+	//
+	// The cloud schema check is kept because it catches a schema.ts change that
+	// was never pushed, but a failure here must NOT take the site down with it.
+	const status = run(['tinacms', 'build', '--skip-indexing'])
+	if (status !== 0) {
+		console.warn(
+			'\n[tina] CMS build failed — continuing so the site still deploys.\n' +
+				'[tina] /admin will 404 on this deploy until the next successful build.\n'
+		)
+	}
 } else {
 	// A missing Tina token should not block a deploy of the site itself —
 	// only the /admin editor will be unavailable. Because static/admin is
