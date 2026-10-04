@@ -5,7 +5,7 @@ import { resolve } from 'node:path'
 // Vite loads .env itself, but this script reads process.env before Vite runs,
 // so without this a local `npm run build` would always skip the CMS build and
 // silently reuse whatever was in static/admin. Real environment variables
-// (CI/Netlify) must keep winning over the file.
+// (CI, Cloudflare Pages) must keep winning over the file.
 const envPath = resolve(process.cwd(), '.env')
 if (existsSync(envPath)) {
 	for (const [key, value] of Object.entries(parseEnv(envPath))) {

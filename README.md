@@ -28,15 +28,16 @@ by `tinacms dev` / `tinacms build`). Its content model lives in `tina/schema.ts`
 and its options in `tina/config.ts`.
 
 Auth is handled by **Tina Cloud**, so there are no GitHub personal access tokens
-and Netlify Identity is not involved. Collaborators are invited by email from the
-Tina dashboard.
+and no site-level identity provider. Collaborators are invited by email from
+the Tina dashboard.
 
 1. Create a free project at [app.tina.io](https://app.tina.io) and connect
    `dankastudios/danka-website`
 2. Copy `.env.example` to `.env` and set `NEXT_PUBLIC_TINA_CLIENT_ID` and
    `TINA_TOKEN` from the project's **Connect** screen
-3. Add the same two variables in Netlify under **Site settings → Environment
-   variables**, then redeploy
+3. Add the same two variables in Cloudflare Pages under **Settings →
+   Environment variables** (mark them available to the production build), then
+   redeploy
 
 `tina/tina-lock.json` pins the schema Tina Cloud indexes — it contains no
 credentials and is committed. Re-run `npm run tina:build` and commit it after

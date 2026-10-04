@@ -11,3 +11,12 @@ export const load = async ({ params }) => {
 
 	return { item, next };
 };
+
+/**
+ * Prerendering needs the full list of paths up front, since there is no
+ * server to resolve a slug at request time.
+ */
+export const entries = () =>
+	readFolioItems()
+		.map((item) => ({ slug: item.slug }))
+		.sort((a, b) => a.slug.localeCompare(b.slug));

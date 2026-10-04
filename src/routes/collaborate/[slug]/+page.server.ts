@@ -19,3 +19,12 @@ export const load = async ({ params }) => {
 		next
 	};
 };
+
+/**
+ * Prerendering needs the full list of paths up front, since there is no
+ * server to resolve a slug at request time.
+ */
+export const entries = () =>
+	readCollaborations()
+		.map((collab) => ({ slug: collab.slug }))
+		.sort((a, b) => a.slug.localeCompare(b.slug));

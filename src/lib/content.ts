@@ -1,8 +1,32 @@
 import matter from 'gray-matter';
-import fs from 'node:fs';
-import path from 'node:path';
 
-const CONTENT_ROOT = path.join(process.cwd(), 'content');
+/**
+ * Every markdown file under content/ is pulled in at build time as a raw
+ * string. This replaces the old node:fs reads, which cannot run on
+ * Cloudflare Workers. With every route prerendered there is no runtime
+ * content layer at all — the markdown is bundled by Vite during the build.
+ */
+const rawFiles = import.meta.glob('/content/**/*.md', {
+	query: '?raw',
+	import: 'default',
+	eager: true
+}) as Record<string, string>;
+
+type ParsedFile = {
+	data: Record<string, unknown>;
+	content: string;
+	slug: string;
+};
+
+const parsedFiles = new Map<string, ParsedFile>();
+for (const [file, raw] of Object.entries(rawFiles)) {
+	const { data, content } = matter(raw);
+	parsedFiles.set(file, {
+		data: data as Record<string, unknown>,
+		content,
+		slug: file.split('/').pop()?.replace(/\.md$/, '') ?? ''
+	});
+}
 
 export type Credit = { role: string; name: string };
 
@@ -70,19 +94,17 @@ export type PageContent = {
 	description: string;
 };
 
-function readMarkdownFile(rel: string) {
-	const full = path.join(process.cwd(), rel);
-	if (!fs.existsSync(full)) return null;
-	const { data, content } = matter(fs.readFileSync(full, 'utf-8'));
-	return { data, content, slug: path.basename(rel, '.md') };
+// Callers pass repo-relative paths ('content/pages/home.md'); the glob keys are
+// root-relative ('/content/pages/home.md').
+function readMarkdownFile(rel: string): ParsedFile | null {
+	return parsedFiles.get(`/${rel.replace(/^\.\//, '')}`) ?? null;
 }
 
 function listDir(dir: string): string[] {
-	const full = path.join(CONTENT_ROOT, dir);
-	if (!fs.existsSync(full)) return [];
-	return fs
-		.readdirSync(full)
-		.filter((f) => f.endsWith('.md'))
+	const prefix = `/content/${dir}/`;
+	return [...parsedFiles.entries()]
+		.filter(([file]) => file.startsWith(prefix))
+		.map(([, parsed]) => `${parsed.slug}.md`)
 		.sort();
 }
 
@@ -184,16 +206,14 @@ export function readFolioItems(): FolioItem[] {
 	return listDir('folio')
 		.map((f) => readFolioItem(f.replace(/\.md$/, '')))
 		.filter((x): x is FolioItem => !!x)
+		// Newest first by the frontmatter date. This used to sort on file mtime,
+		// which cannot work here (no filesystem) and was not reproducible anyway —
+		// simply touching a file reshuffled the whole page.
 		.sort((a, b) => {
-			try {
-				const pa = path.join(CONTENT_ROOT, 'folio', `${a.slug}.md`);
-				const pb = path.join(CONTENT_ROOT, 'folio', `${b.slug}.md`);
-				const sa = fs.statSync(pa).mtimeMs;
-				const sb = fs.statSync(pb).mtimeMs;
-				return sb - sa;
-			} catch {
-				return 0;
-			}
+			const da = str(readMarkdownFile(`content/folio/${a.slug}.md`)?.data.date, '');
+			const db = str(readMarkdownFile(`content/folio/${b.slug}.md`)?.data.date, '');
+			if (da === db) return a.slug.localeCompare(b.slug);
+			return da < db ? 1 : -1;
 		});
 }
 
