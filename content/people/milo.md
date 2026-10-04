@@ -1,11 +1,8 @@
 ---
-
-name: Milo
+name: Chaithra Rao
 roles:
-  - Musician
-  - Composer
+  - Production
+  - Collaborations
 ---
 
-*Sample profile — replace this name, photo and bio in Tina CMS (…/admin/index.html).*
-
-Milo writes and performs original music, scoring films and leading the live music sessions. Plays piano and guitar, with a soft spot for foley and field recordings.
+Actor and creative professional with experience across television, film and independent productions. At Danka Studios, she oversees production, casting and collaborations, coordinating people and resources across different stages of a project. Her acting credits include Jodi Hakki, Bhargavi LLB, Mayabazaar and Tom n Jerry
