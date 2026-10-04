@@ -1,11 +1,8 @@
 ---
-
-name: Aria
+name: Kaushik HA
 roles:
-  - Filmmaker
-  - Director
+  - Creative
+  - Content
 ---
 
-*Sample profile — replace this name, photo and bio in Tina CMS (…/admin/index.html).*
-
-Aria directs and shoots for the collective, moving between short films and theatre productions. Loves long takes, natural light and stories that sit with you after the credits.
+Writer, director and editor with experience across film, web series and theatre. At Danka Studios, he leads creative development, direction, editing and marketing, shaping projects from the initial idea through release and audience outreach. His work includes In the Mood for Marriage, Pressure Cooker, Gowri, and theatre productions IC47 and Dachau.
