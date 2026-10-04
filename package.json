@@ -17,9 +17,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"fetch:youtube": "node scripts/fetch-youtube.mjs",
-		"deploy:cloudflare": "node scripts/deploy-pages.mjs",
-		"preview:cloudflare": "wrangler pages dev .svelte-kit/cloudflare",
-		"deploy": "node scripts/deploy-pages.mjs"
+		"deploy": "node scripts/deploy.mjs"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",

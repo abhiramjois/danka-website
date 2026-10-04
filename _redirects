@@ -1,6 +1,1 @@
-# Cloudflare Pages
-
-# /admin is the TinaCMS SPA. It is emitted as a static asset at
-# /admin/index.html, and Pages resolves the bare /admin to it on its own —
-# this rule makes that explicit and keeps the old SvelteKit redirect honest.
 /admin  /admin/index.html  301

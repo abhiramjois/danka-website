@@ -73,36 +73,32 @@ if (hasCredentials) {
 	)
 }
 
-const status = run(['vite', 'build'])
+process.exit(finishBuild())
 
-if (status === 0) dropUnusedWorker()
-
-process.exit(status)
+function finishBuild() {
+	const status = run(['vite', 'build'])
+	if (status === 0) fixAssetsManifest()
+	return status
+}
 
 /**
- * Cloudflare Pages serves static assets natively, so it needs no Worker at all.
- * adapter-cloudflare still emits one, but it is dead code here: with every route
- * prerendered, _routes.json excludes "*" and no request is ever routed to it.
+ * adapter-cloudflare writes a `.assetsignore` next to its output listing
+ * `_worker.js`, `_routes.json`, `_headers` and `_redirects`.
  *
- * Deleting it means `wrangler pages deploy` has nothing to bundle with esbuild,
- * which matters on CI images where npm may skip dependency install scripts.
+ * Dropping the server files is what we want: every route is prerendered, so
+ * there is no Worker to run and wrangler.toml declares only an assets
+ * directory with no `main` entrypoint.
+ *
+ * But `_redirects` has to reach Cloudflare. Workers parses that file to apply
+ * redirects, and `.assetsignore` would keep it from ever being uploaded, which
+ * breaks the `/admin` link. Removing the manifest keeps `_redirects` and
+ * `_headers` (cache headers for the immutable client bundle) in the upload.
  */
-function dropUnusedWorker() {
-	const out = new URL('../.svelte-kit/cloudflare/', import.meta.url)
-	const routesPath = new URL('_routes.json', out)
+function fixAssetsManifest() {
+	const out = resolve(process.cwd(), '.svelte-kit/cloudflare')
 
-	if (!existsSync(routesPath)) return
-
-	const routes = JSON.parse(readFileSync(routesPath, 'utf8'))
-	const unreachable = routes.exclude?.includes('*') && !routes.include?.some((p) => p !== '/*')
-
-	if (!unreachable) return
-
-	for (const file of ['_worker.js', '_routes.json']) {
-		const path = new URL(file, out)
-		if (existsSync(path)) {
-			rmSync(path)
-			console.log(`[cloudflare] removed unused ${file} (no routes require the Worker)`)
-		}
+	for (const file of ['.assetsignore', '_worker.js', '_routes.json']) {
+		const path = resolve(out, file)
+		if (existsSync(path)) rmSync(path)
 	}
 }

@@ -35,9 +35,8 @@ the Tina dashboard.
    `dankastudios/danka-website`
 2. Copy `.env.example` to `.env` and set `NEXT_PUBLIC_TINA_CLIENT_ID` and
    `TINA_TOKEN` from the project's **Connect** screen
-3. Add the same two variables in Cloudflare Pages under **Settings →
-   Environment variables** (mark them available to the production build), then
-   redeploy
+3. Add the same two variables under **Settings → Variables and Secrets** in the
+   Cloudflare dashboard, applied to the Production environment, then redeploy
 
 `tina/tina-lock.json` pins the schema Tina Cloud indexes — it contains no
 credentials and is committed. Re-run `npm run tina:build` and commit it after

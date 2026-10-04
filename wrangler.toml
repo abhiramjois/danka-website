@@ -1,7 +1,16 @@
 name = "danka-website"
 compatibility_date = "2026-09-01"
-pages_build_output_dir = ".svelte-kit/cloudflare"
 
-# Every route is prerendered (src/routes/+layout.ts) and all markdown content
-# is bundled at build time (src/lib/content.ts), so there are no Workers
-# bindings and no runtime. TinaCMS edits still flow through TinaCloud -> git.
+# This is a Workers project, not Pages, so there is no `pages_build_output_dir`.
+#
+# The site is fully prerendered (src/routes/+layout.ts) and all markdown is
+# bundled at build time (src/lib/content.ts), so there is no server code to
+# run. Declaring only an assets directory makes this an asset-only Worker:
+# Cloudflare serves the built files directly and never starts a Worker. There
+# is deliberately no `main` entrypoint.
+#
+# adapter-cloudflare still emits a _worker.js into the output; scripts/build.mjs
+# removes it (along with the `.assetsignore` that lists it) so nothing needs
+# bundling by esbuild and `_redirects` still reaches Cloudflare.
+[assets]
+directory = ".svelte-kit/cloudflare"
