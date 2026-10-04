@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 // Vite loads .env itself, but this script reads process.env before Vite runs,
@@ -73,4 +73,36 @@ if (hasCredentials) {
 	)
 }
 
-process.exit(run(['vite', 'build']))
+const status = run(['vite', 'build'])
+
+if (status === 0) dropUnusedWorker()
+
+process.exit(status)
+
+/**
+ * Cloudflare Pages serves static assets natively, so it needs no Worker at all.
+ * adapter-cloudflare still emits one, but it is dead code here: with every route
+ * prerendered, _routes.json excludes "*" and no request is ever routed to it.
+ *
+ * Deleting it means `wrangler pages deploy` has nothing to bundle with esbuild,
+ * which matters on CI images where npm may skip dependency install scripts.
+ */
+function dropUnusedWorker() {
+	const out = new URL('../.svelte-kit/cloudflare/', import.meta.url)
+	const routesPath = new URL('_routes.json', out)
+
+	if (!existsSync(routesPath)) return
+
+	const routes = JSON.parse(readFileSync(routesPath, 'utf8'))
+	const unreachable = routes.exclude?.includes('*') && !routes.include?.some((p) => p !== '/*')
+
+	if (!unreachable) return
+
+	for (const file of ['_worker.js', '_routes.json']) {
+		const path = new URL(file, out)
+		if (existsSync(path)) {
+			rmSync(path)
+			console.log(`[cloudflare] removed unused ${file} (no routes require the Worker)`)
+		}
+	}
+}
