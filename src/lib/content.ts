@@ -33,10 +33,16 @@ export type Collaboration = {
 	title: string;
 	subtitle?: string;
 	image?: string;
+	illustration?: string;
 	description: string;
 	/** Slug of a linked Folio item */
 	folio?: string;
 	url?: string;
+};
+
+export type WhatWeDoCard = {
+	label: string;
+	illustration: string;
 };
 
 export type HomeContent = {
@@ -54,6 +60,7 @@ export type HomeContent = {
 	stats_subscribers: string;
 	stats_videos: string;
 	stats_views: string;
+	what_we_do: WhatWeDoCard[];
 	data_updated_note: string;
 };
 
@@ -151,6 +158,14 @@ export function readHomeContent(): HomeContent {
 		stats_subscribers: str(d.stats_subscribers, '4,530'),
 		stats_videos: str(d.stats_videos, '72'),
 		stats_views: str(d.stats_views, '700K'),
+		what_we_do: Array.isArray(d.what_we_do)
+			? (d.what_we_do as Record<string, unknown>[])
+					.map((card) => ({
+						label: str(card?.label),
+						illustration: str(card?.illustration)
+					}))
+					.filter((card) => card.label || card.illustration)
+			: [],
 		data_updated_note: str(d.data_updated_note, '')
 	};
 }
@@ -230,6 +245,7 @@ export function readCollaboration(slug: string): Collaboration | null {
 		title: str(file.data.title, slug),
 		subtitle: str(file.data.subtitle),
 		image: resolveMediaPath(str(file.data.image)),
+		illustration: resolveMediaPath(str(file.data.illustration || '')),
 		description: file.content,
 		folio: str(file.data.folio),
 		url: str(file.data.url)

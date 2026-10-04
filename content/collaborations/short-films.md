@@ -3,6 +3,7 @@ title: Short films & web series
 subtitle: Web series
 image: /images/collab-shortfilms.jpg
 folio: in-the-mood-for-marriage
+illustration: /illustrations/shortfilms-webseries-removebg-preview.png
 ---
 
 Whether it's a single short film or a full web series, we take stories from idea to screen — writing, directing, shooting and finishing in-house.

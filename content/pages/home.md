@@ -12,5 +12,14 @@ about_description: We are a multi disciplinary group of individuals with our own
 stats_subscribers: 12.8K
 stats_videos: '82'
 stats_views: 1.9M
+what_we_do:
+  - label: Short films
+    illustration: /illustrations/shortfilms-webseries-removebg-preview.png
+  - label: Theatre
+    illustration: /illustrations/theatreplays-removebg-preview.png
+  - label: Music
+    illustration: /illustrations/musiccomposition-removebg-preview.png
+  - label: Ad campaigns
+    illustration: /illustrations/brandads-removebg-preview.png
 data_updated_note: ''
 ---

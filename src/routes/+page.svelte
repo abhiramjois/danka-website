@@ -1,6 +1,6 @@
 <script lang="ts">
 	import YoutubeSection from '$lib/components/YoutubeSection.svelte';
-	import type { HomeContent, FolioItem, Person, Collaboration } from '$lib/content';
+	import type { HomeContent, FolioItem, Person } from '$lib/content';
 	import type { YtData } from '$lib/server/youtube';
 	import type { DankaMark } from './+page.server';
 
@@ -11,7 +11,6 @@
 			home: HomeContent;
 			folio: FolioItem[];
 			people: Person[];
-			collaborations: Collaboration[];
 			youtube: YtData;
 			roles: string[];
 			channelUrl: string;
@@ -19,12 +18,7 @@
 		};
 	} = $props();
 
-	const { home, youtube, collaborations, roles, channelUrl, dankaMarks } = $derived(data);
-
-	function markStyle(m: DankaMark) {
-		const dir = m.side === 'right' ? 1 : -1;
-		return `top: ${m.offsetTop}%; ${m.side}: 0; --x: ${dir * m.x}%; --r: ${m.r}deg;`;
-	}
+	const { home, youtube, roles, channelUrl, dankaMarks } = $derived(data);
 
 	const waveLines = Array.from({ length: 18 }, (_, i) => {
 		const t = i / 17;
@@ -33,15 +27,8 @@
 		return `M0,${y} C 240,${y - amp} 480,${y + amp} 720,${y} C 960,${y - amp} 1200,${y + amp} 1440,${y}`;
 	});
 
-	// Collaboration illustrations — shown as a simple non-clickable gallery.
-	const illustrationFor: Record<string, string> = {
-		'ad-campaigns': '/illustrations/brandads-removebg-preview.png',
-		music: '/illustrations/musiccomposition-removebg-preview.png',
-		'short-films': '/illustrations/shortfilms-webseries-removebg-preview.png',
-		theatre: '/illustrations/theatreplays-removebg-preview.png'
-	};
-
-	const collabCards = $derived(collaborations);
+	// "What we do" grid — edited on the home page in Tina.
+	const collabCards = $derived(home.what_we_do);
 </script>
 
 <svelte:head>
@@ -68,11 +55,11 @@
 	{#each dankaMarks as m, i (i)}
 		<img
 			aria-hidden="true"
-			class="danka-mark"
+			class="danka-mark danka-mark--{m.side}"
 			src="/illustrations/Danka logo.png"
 			alt=""
 			draggable="false"
-			style={markStyle(m)}
+			style={`--r: ${m.r}deg`}
 		/>
 	{/each}
 
@@ -102,10 +89,12 @@
 	<a class="btn btn-solid cta-btn" href="/collaborate">Collaborate with us</a>
 
 	<div class="collab-grid">
-		{#each collabCards as item (item.slug)}
+		{#each collabCards as item, i (i)}
 			<div class="collab-card">
-				<img src={illustrationFor[item.slug] ?? item.image} alt={item.title} loading="lazy" />
-				<span class="collab-label">{item.title}</span>
+				{#if item.illustration}
+					<img src={item.illustration} alt={item.label} loading="lazy" />
+				{/if}
+				<span class="collab-label">{item.label}</span>
 			</div>
 		{/each}
 	</div>
@@ -173,7 +162,7 @@
 		position: absolute;
 		z-index: 1;
 		opacity: 0.55;
-		width: clamp(18rem, 42vw, 34rem);
+		width: clamp(16rem, 34vw, 30rem);
 		height: auto;
 		user-select: none;
 		pointer-events: none;
@@ -182,6 +171,19 @@
 			danka-in 1.1s ease both,
 			danka-spin 40s linear infinite;
 		will-change: transform, opacity;
+	}
+
+	/* Corner 1: top-left. Corner 2: bottom-right. Only a small slice is
+	   pushed off-canvas so the logo stays readable, and both sit behind the
+	   hero copy (z-index 1 vs .hero's 2). */
+	.danka-mark--left {
+		top: -3%;
+		left: -8%;
+	}
+
+	.danka-mark--right {
+		bottom: -3%;
+		right: -8%;
 	}
 
 	@keyframes danka-in {
@@ -335,9 +337,53 @@
 		}
 	}
 
+	@media (max-width: 900px) {
+		.danka-mark {
+			width: clamp(11rem, 34vw, 17rem);
+			opacity: 0.4;
+		}
+		.danka-mark--left {
+			top: 0;
+			left: -16%;
+		}
+		.danka-mark--right {
+			bottom: 0;
+			right: -16%;
+		}
+
+		/* Reserve the corner bands so the copy can never reach the logos:
+		   top/bottom padding clears the mark height, and a centred column
+		   keeps the text away from the left/right corners. */
+		.hero {
+			max-width: 32rem;
+			margin-inline: auto;
+			padding-inline: 1.5rem;
+			padding-block: clamp(10rem, 30vh, 15rem);
+		}
+		.hero-description {
+			max-width: 28em;
+		}
+	}
+
 	@media (max-width: 520px) {
 		.collab-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(2, 1fr);
+		}
+		.danka-mark {
+			width: clamp(13rem, 52vw, 19rem);
+			opacity: 0.32;
+		}
+		.danka-mark--left {
+			left: -12%;
+		}
+		.danka-mark--right {
+			right: -12%;
+		}
+		.hero {
+			padding-block: clamp(11rem, 27vh, 14rem);
+		}
+		.hero-description {
+			max-width: 24em;
 		}
 	}
 </style>

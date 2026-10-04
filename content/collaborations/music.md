@@ -3,6 +3,7 @@ title: Music
 subtitle: Production
 image: /images/collab-music.jpg
 folio: live-sessions
+illustration: /illustrations/musiccomposition-removebg-preview.png
 ---
 
 Composition, performance and production — original scores for film and stage, plus full music production for artists.
