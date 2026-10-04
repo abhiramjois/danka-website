@@ -1,12 +1,7 @@
 ---
-
-name: Rhea
+name: Venugopal S
 roles:
-  - Writer
-  - Storyteller
-  - Theatre practitioner
+  - Operations
 ---
 
-*Sample profile — replace this name, photo and bio in Tina CMS (…/admin/index.html).*
-
-Rhea builds the world around every story — writing scripts, adapting plays and shaping narratives for the stage and screen. Trained in theatre, obsessed with character.
+Editor and production professional with experience in post-production and production workflows. At Danka Studios, he oversees operations, production coordination and post-production, ensuring projects move smoothly from planning and production through final delivery.
