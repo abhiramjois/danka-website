@@ -22,8 +22,15 @@ if (!process.env.CLOUDFLARE_API_TOKEN) {
 	process.exit(1)
 }
 
-const result = spawnSync('wrangler', ['pages', 'deploy', '.svelte-kit/cloudflare'], {
-	stdio: 'inherit'
-})
+const args = ['pages', 'deploy', '.svelte-kit/cloudflare']
+
+// wrangler falls back to `name` in wrangler.toml, which defaults to the repo
+// name. The Pages project is not always named after the repo, so allow the
+// real project name to come from the environment.
+const project = process.env.CF_PAGES_PROJECT_NAME
+if (project) args.push('--project-name', project)
+else console.log('[cloudflare] CF_PAGES_PROJECT_NAME is not set — using wrangler.toml')
+
+const result = spawnSync('wrangler', args, { stdio: 'inherit' })
 
 process.exit(result.status ?? 1)
