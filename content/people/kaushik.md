@@ -1,6 +1,6 @@
 ---
 name: Kaushik HA
-photo: /images/Screenshot-2026-10-04-at-2.37.37-PM.png
+photo: /images/Screenshot-2026-10-04-at-2.37.37-PM.jpg
 roles:
   - Creative
   - Content

@@ -1,6 +1,6 @@
 ---
 name: Venugopal S
-photo: /images/Screenshot-2026-10-04-at-5.45.30-PM.png
+photo: /images/Screenshot-2026-10-04-at-5.45.30-PM.jpg
 roles:
   - Operations
 ---

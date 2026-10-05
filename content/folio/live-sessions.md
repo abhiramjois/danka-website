@@ -29,14 +29,14 @@ cast_crew:
     name: Danka Studios
 cover: /images/collab-music.jpg
 posters:
-  - /images/Screenshot 2026-09-16 at 2.50.46 PM-1.png
-  - /images/Screenshot 2026-09-16 at 2.50.26 PM-1.png
+  - /images/Screenshot 2026-09-16 at 2.50.46 PM-1.jpg
+  - /images/Screenshot 2026-09-16 at 2.50.26 PM-1.jpg
 screengrabs:
-  - /images/Screenshot 2026-09-16 at 2.47.12 PM.png
-  - /images/Screenshot 2026-09-16 at 2.46.35 PM-1.png
-  - /images/Screenshot 2026-09-16 at 2.46.13 PM-1.png
-  - /images/Screenshot 2026-09-16 at 2.45.26 PM-1.png
-  - /images/Screenshot 2026-09-16 at 2.45.05 PM-1.png
+  - /images/Screenshot 2026-09-16 at 2.47.12 PM.jpg
+  - /images/Screenshot 2026-09-16 at 2.46.35 PM-1.jpg
+  - /images/Screenshot 2026-09-16 at 2.46.13 PM-1.jpg
+  - /images/Screenshot 2026-09-16 at 2.45.26 PM-1.jpg
+  - /images/Screenshot 2026-09-16 at 2.45.05 PM-1.jpg
 ---
 
 Meet Gowri, a middle-class girl weighed down by daily routines. Hoping to break free from a life that feels endlessly repetitive, she suddenly encounters small sparks of joy she’d never noticed before. Will these quiet revelations guide her toward a renewed sense of purpose, or will her longing for escape prove too strong? Join us to discover how Gowri’s journey unfolds in this thought-provoking Kannada short film.
