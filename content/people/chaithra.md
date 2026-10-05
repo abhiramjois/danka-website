@@ -1,6 +1,6 @@
 ---
 name: Chaithra Rao
-photo: /images/Screenshot-2026-10-04-at-5.59.14-PM.png
+photo: /images/Screenshot-2026-10-04-at-5.59.14-PM.jpg
 roles:
   - Production
   - Collaborations
