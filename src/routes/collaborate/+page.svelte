@@ -5,22 +5,48 @@
 
 	const { page } = $derived(data);
 
-	const CONTACT_EMAIL = 'hello@dankastudios.com';
-
 	const projectTypes = ['Short film', 'Theatre', 'Music', 'Brand ads', 'Other'];
 
 	let name = $state('');
 	let email = $state('');
 	let projectType = $state(projectTypes[0]);
 	let message = $state('');
+	let company = $state('');
 
-	function onSubmit(e: SubmitEvent) {
+	let status = $state<'idle' | 'sending' | 'sent'>('idle');
+	let error = $state('');
+
+	async function onSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		const subject = encodeURIComponent(`Collaboration enquiry — ${name}`);
-		const body = encodeURIComponent(
-			`Name: ${name}\nEmail: ${email}\nProject type: ${projectType}\n\nMessage:\n${message}`
-		);
-		window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+		if (status === 'sending') return;
+
+		status = 'sending';
+		error = '';
+
+		try {
+			const res = await fetch('/api/contact', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ name, email, projectType, message, company })
+			});
+
+			const data = await res.json().catch(() => ({}));
+
+			if (!res.ok || !data.ok) {
+				error = data.error || 'Something went wrong. Please try again.';
+				status = 'idle';
+				return;
+			}
+
+			status = 'sent';
+			name = '';
+			email = '';
+			message = '';
+			company = '';
+		} catch {
+			error = 'Could not reach the server. Check your connection and try again.';
+			status = 'idle';
+		}
 	}
 </script>
 
@@ -38,34 +64,57 @@
 </section>
 
 <section class="container section form-wrap">
-	<form class="contact-form" onsubmit={onSubmit}>
-		<label class="field">
-			<span class="field-label">Your name</span>
-			<input type="text" name="name" bind:value={name} required placeholder="What should we call you?" />
-		</label>
+	{#if status === 'sent'}
+		<div class="sent" role="status">
+			<h2 class="display display-md sent-title">Thank you</h2>
+			<p class="muted">
+				Your enquiry is on its way. We read everything that comes through and usually reply within a
+				couple of days.
+			</p>
+			<button class="btn btn-solid submit" type="button" onclick={() => (status = 'idle')}>
+				Send another
+			</button>
+		</div>
+	{:else}
+		<form class="contact-form" onsubmit={onSubmit}>
+			<label class="field">
+				<span class="field-label">Your name</span>
+				<input type="text" name="name" bind:value={name} required placeholder="What should we call you?" />
+			</label>
 
-		<label class="field">
-			<span class="field-label">Email</span>
-			<input type="email" name="email" bind:value={email} required placeholder="you@example.com" />
-		</label>
+			<label class="field">
+				<span class="field-label">Email</span>
+				<input type="email" name="email" bind:value={email} required placeholder="you@example.com" />
+			</label>
 
-		<label class="field">
-			<span class="field-label">What are you looking to make?</span>
-			<select name="project-type" bind:value={projectType}>
-				{#each projectTypes as type (type)}
-					<option value={type}>{type}</option>
-				{/each}
-			</select>
-		</label>
+			<label class="field">
+				<span class="field-label">What are you looking to make?</span>
+				<select name="project-type" bind:value={projectType}>
+					{#each projectTypes as type (type)}
+						<option value={type}>{type}</option>
+					{/each}
+				</select>
+			</label>
 
-		<label class="field">
-			<span class="field-label">Tell us about it</span>
-			<textarea name="message" bind:value={message} rows="6" placeholder="Your idea, timeline, anything that helps us understand…"></textarea>
-		</label>
+			<label class="field">
+				<span class="field-label">Tell us about it</span>
+				<textarea name="message" bind:value={message} rows="6" placeholder="Your idea, timeline, anything that helps us understand…"></textarea>
+			</label>
 
-		<button class="btn btn-solid submit" type="submit">Send enquiry</button>
-		<p class="muted-soft form-hint">Opens your email app with the details filled in.</p>
-	</form>
+			<label class="field honeypot" aria-hidden="true">
+				<span class="field-label">Company</span>
+				<input type="text" name="company" bind:value={company} tabindex="-1" autocomplete="off" />
+			</label>
+
+			{#if error}
+				<p class="form-error" role="alert">{error}</p>
+			{/if}
+
+			<button class="btn btn-solid submit" type="submit" disabled={status === 'sending'}>
+				{status === 'sending' ? 'Sending…' : 'Send enquiry'}
+			</button>
+		</form>
+	{/if}
 </section>
 
 <style>
@@ -142,7 +191,36 @@
 		border: 0;
 	}
 
-	.form-hint {
-		font-size: 0.82rem;
+	.submit:disabled {
+		opacity: 0.6;
+		cursor: progress;
+	}
+
+	.form-error {
+		font-size: 0.88rem;
+		color: #b4341f;
+		border-left: 2px solid #b4341f;
+		padding-left: 0.85rem;
+	}
+
+	/* Offscreen rather than display:none, which some bots skip. */
+	.honeypot {
+		position: absolute;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+
+	.sent {
+		width: 100%;
+		max-width: 560px;
+		display: flex;
+		flex-direction: column;
+		gap: 1.1rem;
+	}
+
+	.sent-title {
+		margin: 0;
 	}
 </style>

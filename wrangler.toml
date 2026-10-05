@@ -1,16 +1,34 @@
 name = "danka-website"
+main = "worker/index.js"
 compatibility_date = "2026-09-01"
 
 # This is a Workers project, not Pages, so there is no `pages_build_output_dir`.
 #
-# The site is fully prerendered (src/routes/+layout.ts) and all markdown is
-# bundled at build time (src/lib/content.ts), so there is no server code to
-# run. Declaring only an assets directory makes this an asset-only Worker:
-# Cloudflare serves the built files directly and never starts a Worker. There
-# is deliberately no `main` entrypoint.
+# `main` is NOT ours to edit. @sveltejs/adapter-cloudflare reads it from this
+# file and rewrites that exact path on every build (see the `rimraf(worker_dest)`
+# in its index.js), emitting SvelteKit's server worker there. Anything we
+# hand-write there is destroyed on the next `vite build`.
 #
-# adapter-cloudflare still emits a _worker.js into the output; scripts/build.mjs
-# removes it (along with the `.assetsignore` that lists it) so nothing needs
-# bundling by esbuild and `_redirects` still reaches Cloudflare.
+# That is why the contact form is a SvelteKit route
+# (src/routes/api/contact/+server.ts) rather than a bespoke Worker: the
+# generated worker is the entrypoint, and the email binding is reached through
+# `event.platform.env`.
+#
+# The `ASSETS` binding name is read by the adapter too, so it must match the
+# name SvelteKit's generated worker looks for.
 [assets]
 directory = ".svelte-kit/cloudflare"
+binding = "ASSETS"
+
+# Contact form delivery. Email Routing must be enabled on the zone and the
+# recipient confirmed as a destination address, otherwise every send is
+# rejected at runtime.
+#
+# `destination_address` is deliberately not set: it would pin the binding to
+# one address. Email Routing already restricts sending to confirmed
+# destinations, which is the protection worth having.
+#
+# The recipient itself is not configured here. It is read from CONTACT_EMAIL at
+# build time (src/routes/api/contact/+server.ts) — see README.
+[[send_email]]
+name = "EMAIL"

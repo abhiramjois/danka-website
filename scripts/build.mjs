@@ -82,17 +82,17 @@ function finishBuild() {
 }
 
 /**
- * adapter-cloudflare writes a `.assetsignore` next to its output listing
- * `_worker.js`, `_routes.json`, `_headers` and `_redirects`.
+ * For a Workers project the adapter writes a `.assetsignore` into the assets
+ * directory listing `_worker.js`, `_routes.json`, `_headers` and `_redirects`.
  *
- * Dropping the server files is what we want: every route is prerendered, so
- * there is no Worker to run and wrangler.toml declares only an assets
- * directory with no `main` entrypoint.
+ * Dropping it is required, not cosmetic: with the manifest in place Cloudflare
+ * never uploads `_redirects`, which is what makes `/admin` resolve to the CMS
+ * SPA. Removing it keeps `_redirects` and `_headers` in the upload.
  *
- * But `_redirects` has to reach Cloudflare. Workers parses that file to apply
- * redirects, and `.assetsignore` would keep it from ever being uploaded, which
- * breaks the `/admin` link. Removing the manifest keeps `_redirects` and
- * `_headers` (cache headers for the immutable client bundle) in the upload.
+ * `_worker.js` and `_routes.json` are listed defensively. This is a Workers
+ * project, so the adapter writes its worker to `main` (worker/index.js) and
+ * only emits `_routes.json` when targeting Pages, so neither should appear
+ * here — but if one ever does, it must not shadow the real entrypoint.
  */
 function fixAssetsManifest() {
 	const out = resolve(process.cwd(), '.svelte-kit/cloudflare')
