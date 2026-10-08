@@ -6,6 +6,11 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch: # allow manual trigger
 
+# The default GITHUB_TOKEN is read-only, which is what made `git push` fail
+# with 403 and left the site serving stats from the last manual refresh.
+permissions:
+  contents: write
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
