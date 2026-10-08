@@ -2,19 +2,29 @@ import { CONTACT_EMAIL } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const FROM = 'Danka Studios <website@dankastudios.com>';
+const FROM = { name: 'Danka Studios', email: 'website@dankastudios.com' };
 
 /**
+ * Normalises the configured recipient.
+ *
  * The recipient comes from CONTACT_EMAIL, supplied as an environment variable
  * at build time (a Cloudflare build variable in production, or .env locally)
  * and inlined into the server bundle by $env/static/private. Nothing about the
  * destination is hardcoded, so testing against another inbox needs no code
- * change.
+ * change — but Cloudflare only permits sends to addresses confirmed in Email
+ * Routing, which is what stops this endpoint mailing arbitrary strangers.
  *
- * Cloudflare only permits sends to addresses confirmed in Email Routing, which
- * is what stops this endpoint mailing arbitrary strangers.
+ * Cloudflare's dashboard keeps a value pasted from a shell export verbatim, so
+ * `CONTACT_EMAIL="a@b.com"` arrives with the quotes still attached and the
+ * runtime rejects it as an invalid address. Strip them rather than failing at
+ * send time with an opaque error.
  */
-const TO = CONTACT_EMAIL?.trim();
+function configuredRecipient(value: string | undefined): string | undefined {
+	const trimmed = value?.trim().replace(/^["']|["']$/g, '').trim();
+	return trimmed ? trimmed : undefined;
+}
+
+const TO = configuredRecipient(CONTACT_EMAIL);
 
 const LIMITS = {
 	name: 100,
@@ -63,23 +73,13 @@ function scalar(value: unknown, max: number): string {
 	return value.replace(/[\r\n]+/g, ' ').trim().slice(0, max);
 }
 
-/** RFC 2047 encoding, but only when the value is not already plain ASCII. */
-function encodeHeader(value: string) {
-	if (/^[\x20-\x7e]*$/.test(value)) return value;
-
-	let binary = '';
-	for (const byte of new TextEncoder().encode(value)) binary += String.fromCharCode(byte);
-	return `=?UTF-8?B?${btoa(binary)}?=`;
-}
-
-function buildMessage(fields: {
-	to: string;
+function buildBody(fields: {
 	name: string;
 	email: string;
 	projectType: string;
 	message: string;
 }) {
-	const body = [
+	return [
 		`Name: ${fields.name}`,
 		`Email: ${fields.email}`,
 		`Project type: ${fields.projectType}`,
@@ -89,19 +89,6 @@ function buildMessage(fields: {
 		'',
 		'Sent from the collaborate form on dankastudios.com'
 	].join('\n');
-
-	// Header lines need CRLF, otherwise the runtime rejects the message.
-	return [
-		`From: ${FROM}`,
-		`To: ${fields.to}`,
-		`Reply-To: ${fields.email}`,
-		`Subject: ${encodeHeader(`Collaboration enquiry — ${fields.name}`)}`,
-		'MIME-Version: 1.0',
-		'Content-Type: text/plain; charset=utf-8',
-		'Content-Transfer-Encoding: 8bit',
-		'',
-		body
-	].join('\r\n');
 }
 
 /**
@@ -187,15 +174,17 @@ export const POST: RequestHandler = async ({ request, getClientAddress, platform
 	}
 
 	try {
-		await sender.send(
-			new EmailMessage(
-				FROM,
-				to,
-				buildMessage({ to, name, email, projectType, message })
-			)
-		);
+		await sender.send({
+			to,
+			from: FROM,
+			subject: `Collaboration enquiry — ${name}`,
+			text: buildBody({ name, email, projectType, message }),
+			replyTo: email
+		});
 	} catch (error) {
-		console.error('contact form send failed', error);
+		// Cloudflare's send errors carry a `code` (E_RECIPIENT_NOT_ALLOWED,
+		// E_SENDER_NOT_VERIFIED, …) that the dashboard logs will show.
+		console.error('contact form send failed', (error as { code?: string })?.code, error);
 		return json(
 			{ ok: false, error: 'Something went wrong sending that. Please try again.' },
 			{ status: 502 }
