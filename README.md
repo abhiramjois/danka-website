@@ -101,17 +101,21 @@ Nothing works until Cloudflare is set up for sending on the zone:
 
 1. Point `dankastudios.com` nameservers at Cloudflare. Neither Email Routing
    nor Email Sending is available until Cloudflare is authoritative.
-2. **Compute → Email Service → Email Sending → Onboard Domain** →
-   `dankastudios.com`. This adds the SPF/DKIM/DMARC/bounce records that
-   authorize the Worker to send from the domain.
-3. **Email → Email Routing → Destination addresses → Add** → the recipient,
+2. **Email → Email Routing → Destination addresses → Add** → the recipient,
    then confirm the verification email that inbox receives. The binding can
-   only send to confirmed destinations, which is what stops this endpoint
-   mailing arbitrary strangers.
-4. Deploy. Sends fail with a logged error until 2 and 3 are done; the Worker
-   logs `contact form send failed <code>` (for example
-   `E_SENDER_DOMAIN_NOT_AVAILABLE`, `E_RECIPIENT_NOT_ALLOWED`) under
-   Workers → Logs, which names the missing step.
+   only send to addresses confirmed this way, which is what stops this
+   endpoint mailing arbitrary strangers.
+3. Set `CONTACT_EMAIL` to that same address (see below) and deploy. Sends
+   fail with a logged error until both are right; the Worker logs
+   `contact form send failed <code>` (for example
+   `E_RECIPIENT_NOT_ALLOWED`) under Workers → Logs, which names the missing
+   step.
+
+Step 2 is also what makes this work on the **Workers Free** plan: sending to
+a verified destination address is free on all plans and needs no further
+setup. **Compute → Email Service → Email Sending → Onboard Domain** is
+paid-only (Workers Paid), and is only needed to send to arbitrary,
+unverified addresses — which is deliberately not what this endpoint does.
 
 The sending address is `website@dankastudios.com` (`FROM` in the endpoint).
 It only needs to exist on the domain — no mailbox is required for it. The
