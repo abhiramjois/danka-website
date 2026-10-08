@@ -1,84 +1,84 @@
 {
-  "updatedAt": "2026-10-03T11:56:49.387Z",
+  "updatedAt": "2026-10-08T07:49:00.988Z",
   "channel": {
     "channelId": "UC57RodGlZednaNDRKs13uMQ",
     "title": "Danka Studios",
     "description": "Danka Studios is an art collective of passionate storytellers, filmmakers, and artists, dedicated to creating innovative and meaningful content in Kannada. We believe in the power of art to evoke empathy and bring impactful stories to life.\n\nProjects : Gowri (Kannada short), Pressure Cooker(Kannada webseries)\nSubscribe & be part of our journey!\n",
     "thumbnail": "/images/thumbnails/channel.jpg",
-    "subscriberCount": "14.4K",
-    "videoCount": "86",
-    "viewCount": "2.3M"
+    "subscriberCount": "15.6K",
+    "videoCount": "89",
+    "viewCount": "2.6M"
   },
   "videos": [
+    {
+      "videoId": "FhEG2wnwGpo",
+      "title": "In The Mood For Marriage | Episode 8 – Finale | Kannada Web Series [Eng Subs]",
+      "publishedAt": "",
+      "views": "84K",
+      "thumbnail": "/images/thumbnails/FhEG2wnwGpo.jpg"
+    },
+    {
+      "videoId": "WDdbTAUYa10",
+      "title": "IN THE MOOD FOR MARRIAGE | Finale Trailer | Episode 8 | Kannada Web Series | Releasing on Oct 5th",
+      "publishedAt": "",
+      "views": "44K",
+      "thumbnail": "/images/thumbnails/WDdbTAUYa10.jpg"
+    },
     {
       "videoId": "aIcjgNsFgS4",
       "title": "In The Mood For Marriage | Episode 7 | Kannada Web Series [Eng subs]",
       "publishedAt": "",
-      "views": "64K",
+      "views": "89K",
       "thumbnail": "/images/thumbnails/aIcjgNsFgS4.jpg"
     },
     {
       "videoId": "M2e5jh7pmLk",
       "title": "In The Mood For Marriage | Episode 6 | Kannada Web Series | Shrunga B V, Hitha Chandrashekar[EngSub]",
       "publishedAt": "",
-      "views": "86K",
+      "views": "113K",
       "thumbnail": "/images/thumbnails/M2e5jh7pmLk.jpg"
     },
     {
       "videoId": "hyjB36YebDk",
       "title": "In The Mood For Marriage | Episode 5 | Shrunga B V & Hitha Chandrashekar[Eng subtitles]",
       "publishedAt": "",
-      "views": "118K",
+      "views": "132K",
       "thumbnail": "/images/thumbnails/hyjB36YebDk.jpg"
     },
     {
       "videoId": "uQVmhdx1mOk",
       "title": "In The Mood For Marriage | Episode 4 | Kannada Web Series | ಸಪ್ತಪದಿ | [With Eng subtitles]",
       "publishedAt": "",
-      "views": "148K",
+      "views": "162K",
       "thumbnail": "/images/thumbnails/uQVmhdx1mOk.jpg"
     },
     {
       "videoId": "ywoTj8jgfmI",
       "title": "In The Mood For Marriage | Trailer | Kannada Web Series | Episodes 4 & 5 | September 23 |",
       "publishedAt": "",
-      "views": "40K",
+      "views": "42K",
       "thumbnail": "/images/thumbnails/ywoTj8jgfmI.jpg"
     },
     {
       "videoId": "R3u_ENdCZck",
       "title": "In The Mood For Marriage | Episode 3 | Kannada Web Series | Shrunga B V, Hitha Chandrashekar",
       "publishedAt": "",
-      "views": "129K",
+      "views": "142K",
       "thumbnail": "/images/thumbnails/R3u_ENdCZck.jpg"
     },
     {
       "videoId": "adWLkN-DeCk",
       "title": "In The Mood For Marriage | Episode 2 | Kannada Web Series | Shrunga B V, Hitha Chandrashekar",
       "publishedAt": "",
-      "views": "126K",
+      "views": "140K",
       "thumbnail": "/images/thumbnails/adWLkN-DeCk.jpg"
     },
     {
       "videoId": "xUBkvKoHw1A",
       "title": "In The Mood For Marriage | Episode 1 | Kannada Web Series | ಮೊದಲನೇ ಗಂಟು [Eng Subs]",
       "publishedAt": "",
-      "views": "532K",
+      "views": "579K",
       "thumbnail": "/images/thumbnails/xUBkvKoHw1A.jpg"
-    },
-    {
-      "videoId": "Iiy9LRDYHzo",
-      "title": "In The Mood For Marriage | Official Trailer | Kannada Web Series | Shrunga B V, Hitha Chandrashekar",
-      "publishedAt": "",
-      "views": "90K",
-      "thumbnail": "/images/thumbnails/Iiy9LRDYHzo.jpg"
-    },
-    {
-      "videoId": "EEJwVaO_QFg",
-      "title": "The Makers | Official Trailer | Kannada Docu-Drama Series | Danka Studios",
-      "publishedAt": "",
-      "views": "1.2K",
-      "thumbnail": "/images/thumbnails/EEJwVaO_QFg.jpg"
     }
   ]
 }
