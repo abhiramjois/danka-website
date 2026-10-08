@@ -59,6 +59,13 @@ npm run fetch:youtube
 
 Optionally set `YOUTUBE_CHANNEL_URL` or `YTDLP_PATH` in `.env`.
 
+A daily GitHub Action (`.github/workflows/fetch-youtube.yml`) runs the same
+script, commits whatever changed and pushes, which in turn triggers the
+Cloudflare build — so the live numbers update without anyone redeploying by
+hand. It needs `permissions: contents: write` (declared in the file); without
+it the push is rejected with a 403 and the site keeps serving the last manual
+refresh.
+
 > If yt-dlp isn't available or YouTube blocks the request, the site falls back to the numbers in the Home page content (editable in the CMS) and placeholder thumbnails.
 
 ### Content structure
@@ -90,17 +97,28 @@ Cloudflare's email service through the `EMAIL` binding declared in
 `wrangler.toml`, and `Reply-To` is set to the visitor's address so replying
 goes straight back to them.
 
-Nothing works until Email Routing is enabled on the zone:
+Nothing works until Cloudflare is set up for sending on the zone:
 
-1. Point `dankastudios.com` nameservers at Cloudflare. Email Routing is
-   unavailable until Cloudflare is authoritative for the domain.
-2. **Email → Email Routing → Get started** and enable it for the zone.
+1. Point `dankastudios.com` nameservers at Cloudflare. Neither Email Routing
+   nor Email Sending is available until Cloudflare is authoritative.
+2. **Compute → Email Service → Email Sending → Onboard Domain** →
+   `dankastudios.com`. This adds the SPF/DKIM/DMARC/bounce records that
+   authorize the Worker to send from the domain.
 3. **Email → Email Routing → Destination addresses → Add** → the recipient,
-   then confirm the verification email that inbox receives.
-4. Deploy. Sends fail with a logged error until step 3 is confirmed.
+   then confirm the verification email that inbox receives. The binding can
+   only send to confirmed destinations, which is what stops this endpoint
+   mailing arbitrary strangers.
+4. Deploy. Sends fail with a logged error until 2 and 3 are done; the Worker
+   logs `contact form send failed <code>` (for example
+   `E_SENDER_DOMAIN_NOT_AVAILABLE`, `E_RECIPIENT_NOT_ALLOWED`) under
+   Workers → Logs, which names the missing step.
 
 The sending address is `website@dankastudios.com` (`FROM` in the endpoint).
-It only needs to exist on the domain — no mailbox is required for it.
+It only needs to exist on the domain — no mailbox is required for it. The
+message is built with the structured `send({ to, from, subject, text,
+replyTo })` API rather than a raw MIME message: the runtime no longer exposes
+`EmailMessage` as a global, and importing `cloudflare:email` breaks the build
+because the prerender pass loads route modules in Node.
 
 ### Changing the recipient
 
